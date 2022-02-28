@@ -1,28 +1,27 @@
-import face_recognition
-import os
 import cv2
+import os
 
-image = face_recognition.load_image_file("Ryan_1.Jpg")
-face_locations = face_recognition.face_locations(image)
 
-face_location = face_locations[0] 
-face_encodings = face_recognition.face_encodings(image, [face_location])
-Ryan_R_knwon_face_encoding_1 = face_encodings[0]
+cascPath=os.path.dirname(cv2.__file__)+"/data/haarcascade_frontalface_default.xml"
+faceCascade = cv2.CascadeClassifier(cascPath)
 
-image = face_recognition.load_image_file("Ryan_2.Jpg")
-face_locations = face_recognition.face_locations(image)
 
-face_location = face_locations[0]
-face_encodings = face_recognition.face_encodings(image, [face_location])
-Ryan_R_knwon_face_encoding_2 = face_encodings[0]
-
-image = face_recognition.load_image_file("Ryan_3.Jpg")  
-unknwon_face_encodings = face_recognition.face_encodings(image)
-
-print('Matches for Ryan R')
-for unknwon_face_encoding in unknwon_face_encodings:
-    matches = face_recognition.compare_faces(
-        [Ryan_R_knwon_face_encoding_1, Ryan_R_knwon_face_encoding_2], 
-        unknwon_face_encoding 
+video_capture = cv2.VideoCapture(0)
+while True:
+   
+    ret, frames = video_capture.read()
+    gray = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
+    faces = faceCascade.detectMultiScale(
+        gray,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30),
+        flags=cv2.CASCADE_SCALE_IMAGE
     )
-    print(matches)
+   
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frames, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    cv2.imshow('Video', frames)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
